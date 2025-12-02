@@ -25,6 +25,9 @@ Organized by: `year/month/YYYY-MM-DD-topic.md`
 
 ## 📝 Recent Learnings
 
+### December 2025
+- [AWS EKS - The Managed Office Building Analogy](./2025/december/2025-12-02-aws-eks.md) - Understanding EKS as a managed office space
+
 ### November 2025
 - [AWS VPC - The Compound Analogy](./2025/november/2025-11-30-aws-vpc.md) - Understanding VPC through a real-world analogy of a secure compound
 
