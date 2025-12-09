@@ -27,6 +27,7 @@ Organized by: `year/month/YYYY-MM-DD-topic.md`
 
 | Date | Topic | Description |
 |------|-------|-------------|
+| 2025-12-09 | [EKS Networking](./2025/december/2025-12-09-eks-networking.md) | Services, Ingress & Load Balancers in EKS |
 | 2025-12-03 | [AWS VPC CNI](./2025/december/2025-12-03-aws-vpc-cni.md) | How pods get IP addresses in EKS |
 | 2025-12-02 | [AWS EKS](./2025/december/2025-12-02-aws-eks.md) | EKS as a managed office campus |
 | 2025-11-30 | [AWS VPC](./2025/november/2025-11-30-aws-vpc.md) | VPC through a secure compound analogy |
@@ -35,7 +36,7 @@ Organized by: `year/month/YYYY-MM-DD-topic.md`
 
 | Year | Entries | Topics |
 |------|---------|--------|
-| [2025](./2025/) | 3 | AWS (VPC, EKS, VPC CNI) |
+| [2025](./2025/) | 4 | AWS (VPC, EKS, VPC CNI, EKS Networking) |
 
 ---
 
