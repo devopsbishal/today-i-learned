@@ -27,6 +27,7 @@ Organized by: `year/month/YYYY-MM-DD-topic.md`
 
 | Date | Topic | Description |
 |------|-------|-------------|
+| 2025-12-10 | [EKS IAM (IRSA & Pod Identity)](./2025/december/2025-12-10-eks-iam-irsa-pod-identity.md) | How pods get AWS permissions |
 | 2025-12-09 | [EKS Networking](./2025/december/2025-12-09-eks-networking.md) | Services, Ingress & Load Balancers in EKS |
 | 2025-12-03 | [AWS VPC CNI](./2025/december/2025-12-03-aws-vpc-cni.md) | How pods get IP addresses in EKS |
 | 2025-12-02 | [AWS EKS](./2025/december/2025-12-02-aws-eks.md) | EKS as a managed office campus |
@@ -36,7 +37,7 @@ Organized by: `year/month/YYYY-MM-DD-topic.md`
 
 | Year | Entries | Topics |
 |------|---------|--------|
-| [2025](./2025/) | 4 | AWS (VPC, EKS, VPC CNI, EKS Networking) |
+| [2025](./2025/) | 5 | AWS (VPC, EKS, VPC CNI, Networking, IAM) |
 
 ---
 
