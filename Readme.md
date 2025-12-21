@@ -27,6 +27,7 @@ Organized by: `year/month/YYYY-MM-DD-topic.md`
 
 | Date | Topic | Description |
 |------|-------|-------------|
+| 2025-12-19 | [EKS Upgrades](./2025/december/2025-12-19-eks-upgrades.md) | Cluster upgrades, node strategies & maintenance |
 | 2025-12-16 | [EKS Observability](./2025/december/2025-12-16-eks-observability.md) | Metrics, Logs, Traces, Prometheus & X-Ray |
 | 2025-12-14 | [EKS Security](./2025/december/2025-12-14-eks-security.md) | PSS, Network Policies, Secrets, RBAC & GuardDuty |
 | 2025-12-12 | [EKS Autoscaling](./2025/december/2025-12-12-eks-autoscaling.md) | HPA, VPA, Cluster Autoscaler & Karpenter |
@@ -37,7 +38,7 @@ Organized by: `year/month/YYYY-MM-DD-topic.md`
 
 | Year | Entries | Topics |
 |------|---------|--------|
-| [2025](./2025/) | 9 | AWS (VPC, EKS, VPC CNI, Networking, IAM, Storage, Autoscaling, Security, Observability) |
+| [2025](./2025/) | 10 | AWS (VPC, EKS, VPC CNI, Networking, IAM, Storage, Autoscaling, Security, Observability, Upgrades) |
 
 ---
 
