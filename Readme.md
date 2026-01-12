@@ -27,12 +27,12 @@ Organized by: `year/month/YYYY-MM-DD-topic.md`
 
 | Date | Topic | Description |
 |------|-------|-------------|
-| 2025-12-19 | [EKS Upgrades](./2025/december/2025-12-19-eks-upgrades.md) | Cluster upgrades, node strategies & maintenance |
-| 2025-12-16 | [EKS Observability](./2025/december/2025-12-16-eks-observability.md) | Metrics, Logs, Traces, Prometheus & X-Ray |
-| 2025-12-14 | [EKS Security](./2025/december/2025-12-14-eks-security.md) | PSS, Network Policies, Secrets, RBAC & GuardDuty |
-| 2025-12-12 | [EKS Autoscaling](./2025/december/2025-12-12-eks-autoscaling.md) | HPA, VPA, Cluster Autoscaler & Karpenter |
-| 2025-12-11 | [EKS Storage](./2025/december/2025-12-11-eks-storage.md) | PV, PVC, EBS & EFS in EKS |
-| 2025-12-10 | [EKS IAM (IRSA & Pod Identity)](./2025/december/2025-12-10-eks-iam-irsa-pod-identity.md) | How pods get AWS permissions |
+| 2025-12-19 | [EKS Upgrades](./2025/december/eks/2025-12-19-eks-upgrades.md) | Cluster upgrades, node strategies & maintenance |
+| 2025-12-16 | [EKS Observability](./2025/december/eks/2025-12-16-eks-observability.md) | Metrics, Logs, Traces, Prometheus & X-Ray |
+| 2025-12-14 | [EKS Security](./2025/december/eks/2025-12-14-eks-security.md) | PSS, Network Policies, Secrets, RBAC & GuardDuty |
+| 2025-12-12 | [EKS Autoscaling](./2025/december/eks/2025-12-12-eks-autoscaling.md) | HPA, VPA, Cluster Autoscaler & Karpenter |
+| 2025-12-11 | [EKS Storage](./2025/december/eks/2025-12-11-eks-storage.md) | PV, PVC, EBS & EFS in EKS |
+| 2025-12-10 | [EKS IAM (IRSA & Pod Identity)](./2025/december/eks/2025-12-10-eks-iam-irsa-pod-identity.md) | How pods get AWS permissions |
 
 ## 📂 Archive
 

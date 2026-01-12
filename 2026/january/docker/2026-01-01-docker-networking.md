@@ -1067,4 +1067,4 @@ ip link | grep veth                      # See veth pairs on host
 
 
 *Learned: January 1, 2026*
-*Related: [Docker Architecture](2025-12-25-docker-architecture.md), [Containers Fundamentals](2025-12-23-containers-fundamentals.md), [Docker Image Layers](2025-12-28-docker-image-layers.md)*
+*Related: [Docker Architecture](../../../2025/december/docker/2025-12-25-docker-architecture.md), [Containers Fundamentals](../../../2025/december/docker/2025-12-23-containers-fundamentals.md), [Docker Image Layers](../../../2025/december/docker/2025-12-28-docker-image-layers.md)*
