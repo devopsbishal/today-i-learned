@@ -763,4 +763,3 @@ module "vpc" {
 ---
 
 *Written on January 14, 2026*  
-*Day 3/97 - Terraform Modules Part 1*

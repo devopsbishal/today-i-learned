@@ -1683,4 +1683,3 @@ terraform plan  # Should work now!
 ---
 
 *Written on January 12, 2026*  
-*Day 1/97 - Terraform Core Concepts*
