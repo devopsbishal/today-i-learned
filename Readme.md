@@ -27,17 +27,22 @@ Organized by: `year/month/YYYY-MM-DD-topic.md`
 
 | Date | Topic | Description |
 |------|-------|-------------|
-| 2025-12-19 | [EKS Upgrades](./2025/december/eks/2025-12-19-eks-upgrades.md) | Cluster upgrades, node strategies & maintenance |
-| 2025-12-16 | [EKS Observability](./2025/december/eks/2025-12-16-eks-observability.md) | Metrics, Logs, Traces, Prometheus & X-Ray |
-| 2025-12-14 | [EKS Security](./2025/december/eks/2025-12-14-eks-security.md) | PSS, Network Policies, Secrets, RBAC & GuardDuty |
-| 2025-12-12 | [EKS Autoscaling](./2025/december/eks/2025-12-12-eks-autoscaling.md) | HPA, VPA, Cluster Autoscaler & Karpenter |
-| 2025-12-11 | [EKS Storage](./2025/december/eks/2025-12-11-eks-storage.md) | PV, PVC, EBS & EFS in EKS |
-| 2025-12-10 | [EKS IAM (IRSA & Pod Identity)](./2025/december/eks/2025-12-10-eks-iam-irsa-pod-identity.md) | How pods get AWS permissions |
+| 2026-02-05 | [EC2 Instance Types, Placement & Tenancy](./2026/february/aws/2026-02-05-ec2-instance-types-placement-tenancy.md) | Instance families, placement groups & dedicated hosts |
+| 2026-02-02 | [Terraform Project Structure](./2026/january/terraform/2026-02-02-terraform-project-structure.md) | Mono-repo vs multi-repo, environments, naming |
+| 2026-01-30 | [Terraform Cloud/Enterprise](./2026/january/terraform/2026-01-30-terraform-cloud-enterprise.md) | Remote runs, Sentinel, private registry |
+| 2026-01-29 | [Terraform Testing](./2026/january/terraform/2026-01-29-terraform-testing.md) | Validate, plan, terraform test, Terratest |
+| 2026-01-28 | [Terraform Security](./2026/january/terraform/2026-01-28-terraform-security-best-practices.md) | Secrets, state security, tfsec, Checkov |
+| 2026-01-27 | [Terraform Outputs & Remote State](./2026/january/terraform/2026-01-27-terraform-outputs-remote-state.md) | Output patterns, cross-stack references |
+| 2026-01-23 | [Terraform Variables](./2026/january/terraform/2026-01-23-terraform-variables-validation.md) | Variable types, validation, sensitive vars |
+| 2026-01-22 | [Terraform Providers](./2026/january/terraform/2026-01-22-terraform-providers.md) | Configuration, aliases, version constraints |
+| 2026-01-20 | [Terraform Data Sources & Locals](./2026/january/terraform/2026-01-20-terraform-data-sources-locals.md) | Querying resources, local values |
+| 2026-01-19 | [Terraform Functions](./2026/january/terraform/2026-01-19-terraform-functions-expressions.md) | Built-in functions, for expressions |
 
 ## 📂 Archive
 
 | Year | Entries | Topics |
 |------|---------|--------|
+| [2026](./2026/) | 18 | Docker (Networking, Storage, Multi-Stage Builds, Runtimes), Terraform (State, Modules, Workspaces, Functions, Data Sources, Providers, Variables, Outputs, Security, Testing, Cloud/Enterprise, Project Structure), AWS (EC2) |
 | [2025](./2025/) | 10 | AWS (VPC, EKS, VPC CNI, Networking, IAM, Storage, Autoscaling, Security, Observability, Upgrades) |
 
 ---
