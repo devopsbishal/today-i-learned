@@ -27,6 +27,7 @@ Organized by: `year/month/YYYY-MM-DD-topic.md`
 
 | Date | Topic | Description |
 |------|-------|-------------|
+| 2026-02-12 | [Auto Scaling Deep Dive](./2026/february/aws/2026-02-12-auto-scaling-deep-dive.md) | Scaling policies (target tracking, step, simple), predictive scaling, warm pools & lifecycle hooks |
 | 2026-02-09 | [EC2 Networking](./2026/february/aws/2026-02-09-ec2-networking.md) | ENI, ENA, Enhanced Networking, ENA Express/SRD, EFA, MTU & Jumbo Frames |
 | 2026-02-08 | [EC2 Purchasing Options](./2026/february/aws/2026-02-08-ec2-purchasing-options.md) | Spot, Reserved Instances, Savings Plans & Capacity Reservations |
 | 2026-02-05 | [EC2 Instance Types, Placement & Tenancy](./2026/february/aws/2026-02-05-ec2-instance-types-placement-tenancy.md) | Instance families, placement groups & dedicated hosts |
@@ -44,7 +45,7 @@ Organized by: `year/month/YYYY-MM-DD-topic.md`
 
 | Year | Entries | Topics |
 |------|---------|--------|
-| [2026](./2026/) | 20 | Docker (Networking, Storage, Multi-Stage Builds, Runtimes), Terraform (State, Modules, Workspaces, Functions, Data Sources, Providers, Variables, Outputs, Security, Testing, Cloud/Enterprise, Project Structure), AWS (EC2, EC2 Purchasing Options, EC2 Networking) |
+| [2026](./2026/) | 21 | Docker (Networking, Storage, Multi-Stage Builds, Runtimes), Terraform (State, Modules, Workspaces, Functions, Data Sources, Providers, Variables, Outputs, Security, Testing, Cloud/Enterprise, Project Structure), AWS (EC2, EC2 Purchasing Options, EC2 Networking, Auto Scaling) |
 | [2025](./2025/) | 10 | AWS (VPC, EKS, VPC CNI, Networking, IAM, Storage, Autoscaling, Security, Observability, Upgrades) |
 
 ---
