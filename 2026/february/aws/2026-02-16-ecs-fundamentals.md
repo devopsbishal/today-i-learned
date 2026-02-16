@@ -19,7 +19,8 @@
 | Task Execution Role | The stage manager's credentials | What the stage manager needs to set up the performance: pull costumes (images), set up lighting (logs) |
 | Fargate Launch Type | Renting a fully managed sound stage | Show up, perform, leave -- the studio handles the building, electricity, and cleanup |
 | EC2 Launch Type | Owning your own sound stages | You manage the buildings and equipment, but you control every detail |
-| Capacity Provider | The studio's resource procurement department | Decides where to find sound stages -- rent them (Fargate), use owned ones (EC2 ASG), or mix both |
+| ECS Managed Instances | Leasing stages from a management company | The management company owns and maintains the building, but you pick the type of stage and can run multiple shows on it |
+| Capacity Provider | The studio's resource procurement department | Decides where to find sound stages -- rent them (Fargate), use owned ones (EC2 ASG), lease managed ones, or mix |
 | Capacity Provider Strategy | The procurement policy | "Use 70% owned stages, 30% rented stages" or "rent first, overflow to owned" |
 | awsvpc Network Mode | Each performance gets its own phone line | Every task gets a dedicated ENI with its own IP address and security groups |
 | Rolling Update | Gradually replacing actors between shows | New actors start performing while old ones finish their current show; audience never notices the swap |
@@ -35,7 +36,7 @@ Imagine you run a **film studio** that produces live performances on demand. Aud
 
 1. **Screenplays** (task definitions) -- Detailed blueprints that describe every aspect of a production: which actors are needed, what costumes they wear, how much stage space they require, and what props they need access to.
 2. **A production manager** (service) -- Someone who ensures the right number of shows are always running, replaces any that fail mid-performance, and smoothly transitions from old productions to new ones.
-3. **Sound stages and equipment** (capacity providers) -- The physical infrastructure where performances happen. You can rent fully managed stages (Fargate) or own and operate your own (EC2).
+3. **Sound stages and equipment** (capacity providers) -- The physical infrastructure where performances happen. You can rent fully managed stages (Fargate), own and operate your own (EC2), or lease managed stages where a management company handles the building but you pick the stage type (ECS Managed Instances).
 
 All of this happens within a **studio lot** (cluster) -- the logical boundary that contains your productions, stages, and staff.
 
@@ -680,22 +681,24 @@ resource "aws_appautoscaling_policy" "web_app_cpu" {
 
 ### The Analogy
 
-The studio's **resource procurement department** decides where performances actually happen. They have three options:
+The studio's **resource procurement department** decides where performances actually happen. They have four options:
 
-1. **Rent fully managed stages (Fargate)** -- Show up, perform, leave. The rental company handles the building, electricity, cleaning, and maintenance. You pay per minute of stage time. Simple but premium-priced.
+1. **Rent fully managed stages (Fargate)** -- Show up, perform, leave. The rental company handles the building, electricity, cleaning, and maintenance. You pay per minute of stage time. Simple but premium-priced. Each show gets its own private stage (one task per environment).
 
 2. **Rent discounted stages (Fargate Spot)** -- Same quality stages but at up to 70% off. The catch: the rental company can reclaim the stage with a 2-minute warning if someone else needs it. Great for workloads that can handle interruptions.
 
-3. **Use owned stages (EC2 capacity provider)** -- You own the buildings and equipment. You control maintenance schedules, can install custom equipment, and pay for the building whether or not a show is running. The capacity provider connects your fleet of owned stages (Auto Scaling Group) to ECS, and **managed scaling** automatically builds or demolishes stages based on demand.
+3. **Lease managed stages (ECS Managed Instances)** -- A management company owns the buildings. You tell them what kind of stage you need (size, special equipment like GPUs), and they find the best one, maintain it, and replace it every 14 days for safety inspections. Multiple shows can run on the same stage simultaneously (multi-task bin-packing), making it cheaper than renting individual stages. You cannot customize the building itself (no custom AMIs) or get your own keys (no SSH), but you can peek inside through a window (ECS Exec).
 
-The **capacity provider strategy** is the procurement policy that determines the mix. You can say "always use 2 owned stages as a base, then fill additional demand with 70% rented and 30% discount." This gives you cost optimization with reliability guarantees.
+4. **Use owned stages (EC2 self-managed)** -- You own the buildings and equipment. You control maintenance schedules, can install custom equipment, and pay for the building whether or not a show is running. The capacity provider connects your fleet of owned stages (Auto Scaling Group) to ECS, and **managed scaling** automatically builds or demolishes stages based on demand.
+
+The **capacity provider strategy** is the procurement policy that determines the mix. You can say "always use 2 owned stages as a base, then fill additional demand with 70% rented and 30% discount." One important rule: a single strategy can only contain one type (Fargate/Spot, Managed Instances, or ASG-backed EC2 -- not mixed). To combine types, use different services or cluster-level defaults.
 
 ### The Technical Reality
 
 Capacity providers are the link between ECS services and the compute infrastructure that runs tasks. They abstract away the underlying infrastructure decisions, letting services declare what they need rather than where to run.
 
 ```
-CAPACITY PROVIDERS — THE THREE OPTIONS
+CAPACITY PROVIDERS — THE FOUR OPTIONS
 =============================================================================
 
   FARGATE CAPACITY PROVIDER:
@@ -715,7 +718,27 @@ CAPACITY PROVIDERS — THE THREE OPTIONS
   ├── ECS attempts to replace interrupted tasks automatically
   └── Best for: batch processing, dev/test, fault-tolerant workloads
 
-  EC2 CAPACITY PROVIDER (backed by ASG):
+  ECS MANAGED INSTANCES (launched Sept 2025):
+  ────────────────────────────────────────────────────
+  ├── Fully managed EC2 — AWS provisions, scales, patches, and replaces instances
+  ├── You define task requirements (vCPU, memory, CPU architecture)
+  │   and ECS selects optimal instance types automatically
+  ├── MULTI-TASK PLACEMENT: packs multiple tasks per instance (unlike Fargate)
+  │   for better cost efficiency via bin-packing
+  ├── ACTIVE CONSOLIDATION: identifies underutilized instances, drains them,
+  │   and right-sizes replacements as workload changes
+  ├── Runs Bottlerocket OS (hardened, immutable root filesystem)
+  ├── No SSH access — use ECS Exec for debugging
+  ├── 14-day max instance lifetime — auto-replaced for security patching
+  ├── Supports GPU and specialized hardware (unlike Fargate)
+  ├── Supports Spot Instances (since Dec 2025) for cost savings
+  ├── Networking: awsvpc and host modes
+  ├── Storage: 30-16,384 GiB EBS (default 80 GiB), shared across tasks
+  ├── Savings Plans apply (Compute and Instance)
+  └── Best for: GPU workloads, multi-task cost optimization, teams wanting
+      EC2 capabilities without EC2 operational burden
+
+  EC2 CAPACITY PROVIDER (backed by ASG — self-managed):
   ────────────────────────────────────────────────────
   ├── You manage the EC2 instances via an Auto Scaling Group
   ├── Capacity provider links the ASG to ECS
@@ -724,7 +747,7 @@ CAPACITY PROVIDERS — THE THREE OPTIONS
   ├── Target capacity %: how full to pack instances (100% = fully packed)
   ├── MANAGED TERMINATION PROTECTION: prevents scale-in from killing
   │   instances that still have running tasks
-  └── Best for: GPU workloads, custom AMIs, licensing, sustained load
+  └── Best for: custom AMIs, kernel configs, SSH access, licensing, sustained load
 
 
   CAPACITY PROVIDER STRATEGY — THE PROCUREMENT POLICY:
@@ -915,42 +938,52 @@ resource "aws_iam_role_policy_attachment" "ecs_instance" {
 
 ---
 
-## Part 4: Fargate vs EC2 - Choosing Your Compute Model
+## Part 4: Fargate vs Managed Instances vs EC2 - Choosing Your Compute Model
 
 ```
-FARGATE vs EC2 DECISION FRAMEWORK
+FARGATE vs MANAGED INSTANCES vs EC2 DECISION FRAMEWORK
 =============================================================================
 
-                        FARGATE                      EC2
-                        ───────                      ───
-  Operations            Fully managed                You manage instances,
-                        (no patching, no AMIs)       AMIs, patching, agents
+                        FARGATE              MANAGED INSTANCES        EC2 (self-managed)
+                        ───────              ─────────────────        ──────────────────
+  Operations            Fully managed        Fully managed            You manage instances,
+                        (no patching)        (AWS patches every       AMIs, patching, agents
+                                             14 days, auto-replace)
 
-  Networking            awsvpc only                  awsvpc, bridge, host, none
-                        (1 ENI per task)
+  Networking            awsvpc only          awsvpc, host             awsvpc, bridge,
+                        (1 ENI per task)                              host, none
 
-  Pricing               Per vCPU-second +            Per instance (pay whether
-                        per GB-second                or not tasks fill it)
+  Pricing               Per vCPU-second +    Per EC2 instance +       Per EC2 instance
+                        per GB-second        management fee           (no management fee)
 
-  Cost at scale         Higher per unit              Lower per unit if well-
-                        (premium for simplicity)     utilized (bin-packing)
+  Cost at scale         Higher per unit      Lower — multi-task       Lowest if well-utilized
+                        (premium for ease)   bin-packing on instances (full control)
 
-  Startup time          ~30-60 seconds               Depends on instance launch
-                                                     + ECS agent registration
+  Startup time          ~30-60 seconds       Depends on instance      Depends on instance
+                                             launch                   launch + agent
 
-  GPU support           No                           Yes
+  GPU support           No                   Yes                      Yes
 
-  Custom AMI            No                           Yes
+  Custom AMI            No                   No (Bottlerocket only)   Yes
 
-  Task size limits      0.25-16 vCPU                 Limited by instance type
-                        0.5-120 GB memory            (up to 448 vCPU, 24 TB)
+  Task size limits      0.25-16 vCPU         Limited by instance      Limited by instance
+                        0.5-120 GB memory    type selection           type (full range)
 
-  Persistent storage    EFS and EBS                  EBS, EFS, instance store
+  Persistent storage    EFS and EBS          EBS (30-16384 GiB)       EBS, EFS, instance
+                                             shared across tasks      store
 
-  Daemon tasks          Not supported                Supported
+  Daemon tasks          Not supported        Not supported            Supported
 
-  Spot capacity         Fargate Spot (2 min warning)  EC2 Spot via ASG
-                                                     (2 min warning)
+  Spot capacity         Fargate Spot         Managed Instances Spot   EC2 Spot via ASG
+                        (2 min warning)      (since Dec 2025)         (2 min warning)
+
+  SSH access            No                   No (ECS Exec only)       Yes
+
+  Multi-task/instance   No (1 task per env)  Yes (default behavior)   Yes (you configure)
+
+  Instance lifetime     N/A                  14-day max (security)    Unlimited
+
+  Savings Plans         No                   Yes (Compute/Instance)   Yes (Compute/Instance)
 
 
   DECISION GUIDE:
@@ -963,18 +996,27 @@ FARGATE vs EC2 DECISION FRAMEWORK
   ├── Running many small, independent services
   └── Cost predictability matters more than cost optimization
 
-  Choose EC2 when:
-  ├── You need GPUs (ML inference, video processing)
-  ├── You need custom AMIs or kernel configurations
-  ├── High, sustained utilization makes per-instance pricing cheaper
-  ├── You need daemon services (monitoring agents on every host)
-  ├── Tasks need more than 16 vCPU or 120 GB memory
-  └── You need EBS volumes or instance store
+  Choose MANAGED INSTANCES when:
+  ├── You need GPU or specialized hardware without managing instances
+  ├── You want multi-task bin-packing for cost savings (unlike Fargate)
+  ├── You want AWS to handle patching and instance lifecycle
+  ├── Your tasks can tolerate 14-day instance replacement cycles
+  └── You want Savings Plans to apply (unlike Fargate)
 
-  Choose BOTH (mixed strategy) when:
-  ├── Base load on EC2 (cost-efficient for guaranteed minimum)
+  Choose EC2 (self-managed) when:
+  ├── You need custom AMIs or kernel configurations
+  ├── You need SSH access to instances
+  ├── You need daemon services (monitoring agents on every host)
+  ├── You need bridge networking mode
+  ├── Tasks run longer than 14 days continuously
+  └── You need full control over instance lifecycle
+
+  Choose a MIXED strategy when:
+  ├── Base load on EC2/Managed Instances (cost-efficient for guaranteed minimum)
   ├── Burst/overflow on Fargate (elastic, no capacity planning)
-  └── This is a common production pattern via capacity provider strategies
+  └── Note: a capacity provider strategy can only contain ONE type
+  │   (Managed Instances, ASG, or Fargate/Fargate Spot — not mixed)
+  └── Use separate services or cluster-level defaults to combine types
 ```
 
 ---
@@ -1066,14 +1108,15 @@ COMPLETE ECS ARCHITECTURE
 9. **EC2 managed scaling eliminates the need for separate ASG scaling policies** -- When you enable managed scaling on an EC2 capacity provider, ECS calculates the required capacity based on pending tasks and adjusts the ASG directly; do not add conflicting ASG scaling policies
 10. **Target capacity below 100% provides headroom for burst** -- Setting target_capacity to 80% means instances are kept at 80% utilization, leaving 20% spare capacity for tasks that need to be placed immediately without waiting for a new instance to launch
 
-### Fargate vs EC2
-11. **Start with Fargate and move to EC2 only when you have a specific reason** -- GPU requirements, custom AMIs, sustained high utilization, or tasks needing more than 16 vCPU or 120 GB memory are the main reasons to bring in EC2
-12. **Mixed strategies are the production sweet spot** -- Base load on EC2 (cost-efficient) with burst on Fargate (elastic, no capacity planning) gives you the best of both worlds via capacity provider strategies
-13. **Fargate Spot is excellent for fault-tolerant workloads** -- Queue processors, batch jobs, and dev/test environments can save up to 70% with Fargate Spot; just ensure your application handles SIGTERM gracefully for the 2-minute interruption warning
+### Fargate vs Managed Instances vs EC2
+11. **Start with Fargate, then consider Managed Instances before self-managed EC2** -- Fargate is simplest; if you need GPU, multi-task bin-packing, or Savings Plans, try Managed Instances; only go self-managed EC2 for custom AMIs, SSH access, daemon tasks, or bridge networking
+12. **ECS Managed Instances is the middle ground** -- It gives you EC2 capabilities (GPU, specialized hardware, multi-task bin-packing, Savings Plans) with Fargate-like operational simplicity (no AMI management, no ASG configuration, automatic patching every 14 days); the trade-off is no custom AMIs, no SSH, and a 14-day instance lifetime
+13. **Mixed strategies are the production sweet spot** -- Base load on EC2/Managed Instances (cost-efficient) with burst on Fargate (elastic, no capacity planning); note that a single capacity provider strategy cannot mix types (Managed Instances, ASG, and Fargate are mutually exclusive within one strategy)
+14. **Fargate Spot is excellent for fault-tolerant workloads** -- Queue processors, batch jobs, and dev/test environments can save up to 70% with Fargate Spot; just ensure your application handles SIGTERM gracefully for the 2-minute interruption warning
 
 ### Operational Essentials
-14. **Enable Container Insights from day one** -- It provides cluster-level and service-level metrics (CPU, memory, network, storage) without any agent installation; the cost is minimal compared to the debugging time it saves
-15. **Three systems interact and must be configured together** -- Service auto scaling adjusts desired task count, capacity providers ensure enough compute exists to place those tasks, and deployment configuration controls how task replacements happen during updates; configuring service auto scaling without capacity provider managed scaling means the service wants more tasks but there is no infrastructure to place them on
+15. **Enable Container Insights from day one** -- It provides cluster-level and service-level metrics (CPU, memory, network, storage) without any agent installation; the cost is minimal compared to the debugging time it saves
+16. **Three systems interact and must be configured together** -- Service auto scaling adjusts desired task count, capacity providers ensure enough compute exists to place those tasks, and deployment configuration controls how task replacements happen during updates; configuring service auto scaling without capacity provider managed scaling means the service wants more tasks but there is no infrastructure to place them on
 
 ---
 
