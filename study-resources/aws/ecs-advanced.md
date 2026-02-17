@@ -1,0 +1,71 @@
+# ECS Advanced: Service Discovery, Service Mesh, ECS Anywhere, and Capacity Provider Strategies -- 2-Hour Study Plan
+
+**Total Time:** ~120 minutes
+**Created:** 2026-02-17
+**Difficulty:** Intermediate-Advanced
+
+## Overview
+
+This study plan covers four advanced ECS topics that extend your foundational knowledge: how services find and communicate with each other through Cloud Map service discovery and ECS Service Connect, how service mesh patterns work with Envoy proxies and why AWS is transitioning from App Mesh to Service Connect, how ECS Anywhere extends container orchestration to on-premises infrastructure with the EXTERNAL launch type, and how advanced capacity provider strategies use managed scaling, target capacity reservation, and placement strategies like binpack and spread to optimize cost and availability. After completing this plan, you will understand the full spectrum of ECS service-to-service communication options, know when to use each interconnection method, understand the architecture and trade-offs of running ECS workloads outside AWS, and be able to design sophisticated capacity provider strategies that balance cost efficiency with high availability across availability zones.
+
+## Resources
+
+### 1. Interconnect Amazon ECS Services (Official Docs) -- 15 min
+- **URL:** https://docs.aws.amazon.com/AmazonECS/latest/developerguide/interconnecting-services.html
+- **Type:** Official Docs
+- **Summary:** The essential starting point that maps out all four ways ECS services communicate: ECS Service Connect (recommended for most use cases, provides managed discovery plus traffic management), ECS Service Discovery via Cloud Map (direct container-to-container DNS resolution with lower latency but requires client-side retry logic), Amazon VPC Lattice (managed application networking with target groups for cross-service routing), and Elastic Load Balancing (for external internet-facing traffic). Includes a critical compatibility table showing which interconnection methods work with each network mode (bridged, awsvpc, host). Read this first to build the decision framework for choosing between discovery approaches -- everything else in this plan fills in the details of these options.
+
+### 2. Use Service Discovery to Connect Amazon ECS Services with DNS Names (Official Docs) -- 20 min
+- **URL:** https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-discovery.html
+- **Type:** Official Docs
+- **Summary:** The definitive reference for Cloud Map-based service discovery, covering the four-layer architecture: namespaces (logical groupings with a shared domain like `production.local`), services (DNS-addressable entries within a namespace), service registries (DNS or API lookup returning available endpoints), and instances (individual ECS tasks registered with their IP, port, and metadata attributes). Pay close attention to the DNS record types by network mode -- awsvpc supports A and AAAA records for direct IP resolution, while bridge and host modes require SRV records that return both IP and port. Covers health check integration where ECS automatically manages Cloud Map health status based on container health checks, removing unhealthy instances from DNS routing. Key limitations to internalize: 1,000 tasks per service due to Route 53 quotas, private IPs only even with public namespaces, and no support for shared Cloud Map namespaces (unlike Service Connect).
+
+### 3. Use Service Connect to Connect Amazon ECS Services with Short Names (Official Docs) -- 20 min
+- **URL:** https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-connect.html
+- **Type:** Official Docs
+- **Summary:** The conceptual overview of ECS Service Connect, the newer and recommended approach that combines service discovery and service mesh into a single ECS-native configuration. Unlike raw Cloud Map discovery where your application must handle DNS TTL caching and implement retry logic, Service Connect injects a managed proxy container into each task that provides round-robin load balancing, outlier detection (automatically routing around unhealthy endpoints), and automatic retries -- all without application code changes. Covers the key terminology: port names identify discoverable endpoints in task definitions, client aliases define the short DNS names other services use (like `mysql` instead of a fully qualified domain), namespaces group services that can discover each other, and client vs client-server service roles determine whether a service only consumes or also provides endpoints. The critical architectural insight is that Service Connect manages Cloud Map registration and Envoy proxy configuration automatically, eliminating the manual sidecar management that App Mesh required.
+
+### 4. Migrating from AWS App Mesh to Amazon ECS Service Connect (AWS Containers Blog) -- 15 min
+- **URL:** https://aws.amazon.com/blogs/containers/migrating-from-aws-app-mesh-to-amazon-ecs-service-connect/
+- **Type:** Blog (Official AWS)
+- **Summary:** Essential context for understanding the ECS service mesh landscape: AWS is discontinuing App Mesh on September 30, 2026, and Service Connect is the recommended successor. This blog explains what App Mesh provided (a full service mesh with Envoy sidecar proxies, virtual nodes, virtual services, virtual routers, and routes for fine-grained traffic control across ECS, EKS, and EC2), why it was complex (you had to manually configure and deploy one to three sidecar containers per service), and how Service Connect simplifies the same patterns by managing the Envoy data plane automatically through ECS service configuration. The migration path section reveals the conceptual mapping between the two: App Mesh virtual nodes become Service Connect endpoints, virtual services become client aliases, and traffic policies become built-in proxy behaviors. Read this to understand both the App Mesh architecture (still relevant for interviews and legacy systems) and why Service Connect represents a better operational model for ECS-only workloads.
+
+### 5. Amazon ECS Clusters for External Instances -- ECS Anywhere (Official Docs) -- 15 min
+- **URL:** https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-anywhere.html
+- **Type:** Official Docs
+- **Summary:** The comprehensive reference for ECS Anywhere, which extends ECS orchestration to on-premises servers and VMs using the EXTERNAL launch type. Covers the full architecture: external instances run both the SSM Agent (for secure communication with AWS, with credentials rotated every 30 minutes via hardware fingerprint) and the ECS Agent (for task lifecycle management), with Docker as the container runtime. Details supported operating systems (Amazon Linux 2023, Ubuntu 20/22/24, RHEL 9) across x86_64 and ARM64 architectures. The limitations section is critical to internalize: ECS Anywhere does not support load balancers, service discovery, awsvpc network mode, capacity providers, EFS volumes, or App Mesh -- only bridge, host, and none networking modes are available. This means external instances are optimized for outbound workloads (data processing, batch jobs, edge computing) rather than inbound request-serving services. Each external instance can only be registered to one cluster at a time, and all required AWS endpoint connectivity (ECS, SSM, EC2 Messages) must be established through your network.
+
+### 6. Automatically Manage Amazon ECS Capacity with Cluster Auto Scaling (Official Docs) -- 15 min
+- **URL:** https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cluster-auto-scaling.html
+- **Type:** Official Docs
+- **Summary:** The core reference for capacity provider managed scaling, the system that automatically adjusts EC2 Auto Scaling Group capacity based on ECS task demand. Explains the CapacityProviderReservation metric formula: (instances needed / instances running) x 100, which ECS publishes to CloudWatch. When this metric exceeds the targetCapacity percentage, ECS scales out; when it falls below, ECS scales in. The targetCapacity parameter is the key tuning lever -- setting it to 100 means fully packed instances with no spare capacity, while 90 maintains 10% headroom for burst workloads. Covers the critical interaction between placement strategies and capacity providers: when targetCapacity is less than 100%, binpack must have a higher order than spread in your placement strategy to prevent premature scale-out. Also covers managed termination protection (prevents ASG from terminating instances running tasks), the initial scale-out behavior (always launches 2 instances when scaling from zero), and the 15-minute stabilization window between scale-out and scale-in actions.
+
+### 7. Amazon ECS Managed Scaling Behavior (Official Docs) -- 10 min
+- **URL:** https://docs.aws.amazon.com/AmazonECS/latest/developerguide/managed-scaling-behavior.html
+- **Type:** Official Docs
+- **Summary:** A deeper look at the managed scaling algorithm that drives capacity provider decisions. Explains how ECS groups pending tasks by identical resource requirements, then uses a binpack calculation accounting for vCPU, memory, ENI, ports, and GPU needs to determine the minimum number of instances required. Covers a critical edge case: if any task's resource requirements exceed the smallest instance type in your ASG, those tasks remain stuck in PROVISIONING state and no scaling occurs -- the system silently fails rather than launching larger instances. Details the instanceWarmupPeriod parameter (default 300 seconds) that prevents the scaling algorithm from counting recently launched instances as available capacity. Read this after the cluster auto scaling page to understand the mechanics behind the CapacityProviderReservation metric and why keeping ASG instance types similar in size is a best practice.
+
+### 8. Evenly Balance a Large ECS Deployment Across Availability Zones (Containers on AWS) -- 10 min
+- **URL:** https://containersonaws.com/pattern/balanced-ecs-on-ec2-container-deployment-across-az/
+- **Type:** Blog (AWS Community)
+- **Summary:** A production-ready pattern that solves a real operational problem: default ECS placement strategies like `spread(attribute:ecs.availability-zone), binpack(CPU)` are "best effort" and can result in uneven task distribution across AZs, especially during rolling deployments or partial scale-ins. The solution uses zonal capacity providers -- a separate Auto Scaling Group per availability zone, each linked to its own capacity provider -- with a capacity provider strategy that assigns equal weights to enforce even distribution. Includes CloudFormation templates, architecture diagrams showing how imbalance occurs with a single multi-AZ ASG, and an honest discussion of the trade-off: this approach deliberately wastes some capacity to guarantee balanced placement. This pattern ties together capacity providers, placement strategies, and high availability into a concrete, deployable architecture.
+
+## Study Tips
+
+- **Build a comparison matrix as you read the first four resources:** Create a table with rows for Cloud Map Service Discovery, ECS Service Connect, App Mesh (legacy), and VPC Lattice, with columns for discovery mechanism (DNS vs API vs proxy), traffic management features (load balancing, retries, outlier detection), configuration complexity, network mode requirements, cross-cluster support, and cost. This matrix will become your decision framework and is the kind of artifact interviewers expect you to be able to produce from memory. The key insight: Service Connect is Cloud Map plus managed Envoy proxies, while raw service discovery gives you DNS resolution but leaves traffic management to your application code.
+
+- **Pay attention to what ECS Anywhere cannot do, not just what it can do:** The limitations of the EXTERNAL launch type are more important than its capabilities for architectural decisions. No load balancers, no service discovery, no awsvpc, no capacity providers -- this means ECS Anywhere is fundamentally different from Fargate or EC2 launch types in what workload patterns it supports. The interview question is almost always "when would you NOT use ECS Anywhere?" rather than "what is ECS Anywhere?"
+
+- **Trace the capacity provider scaling algorithm on paper with concrete numbers:** Take a scenario with 10 running tasks each needing 1 vCPU and 2GB memory, an ASG with m5.large instances (2 vCPU, 8GB memory), and a targetCapacity of 80%. Calculate: how many instances does binpack require (5 instances, packing 2 tasks per instance), what is CapacityProviderReservation if 6 instances are running (5/6 x 100 = 83%), and what scaling action occurs (83% > 80% target, so no scale-in yet). Working through these numbers makes the abstract formula concrete and prepares you for scenario-based questions.
+
+## Next Steps
+
+After completing this study plan, consider exploring:
+
+1. **Hands-on Service Connect lab** -- Deploy two Fargate services in a namespace, configure Service Connect with client aliases, and observe the automatic proxy injection, CloudWatch metrics (connection counts, latency percentiles, error rates), and outlier detection behavior by deliberately failing one task. This makes the Service Connect concepts tangible.
+
+2. **ECS observability with Container Insights and X-Ray** -- Learn how to trace requests across Service Connect endpoints using AWS X-Ray distributed tracing, correlate traces with Service Connect metrics in CloudWatch, and set up alarms on proxy-level metrics like 5xx error rates and P99 latency that Service Connect exposes automatically.
+
+3. **ECS with Terraform** -- Define capacity provider strategies, service discovery namespaces, and Service Connect configurations as infrastructure as code. Terraform forces you to explicitly declare every dependency between capacity providers, ASGs, services, and namespaces, which reinforces how these components connect.
+
+4. **VPC Lattice for cross-account service networking** -- Explore AWS VPC Lattice as the next evolution beyond Service Connect for service-to-service communication that spans multiple accounts, VPCs, and compute types (ECS, EKS, Lambda, EC2) with centralized access control and observability.
