@@ -27,6 +27,7 @@ Organized by: `year/month/YYYY-MM-DD-topic.md`
 
 | Date | Topic | Description |
 |------|-------|-------------|
+| 2026-02-19 | [VPC Advanced: CIDR Planning & Subnet Strategy](./2026/february/aws/2026-02-19-vpc-advanced-cidr-subnet-strategy.md) | CIDR planning for 10+ VPCs, subnet tiers (public/private/isolated), route table design, Regional NAT Gateway, VPC endpoints, IPAM |
 | 2026-02-17 | [ECS Advanced](./2026/february/aws/2026-02-17-ecs-advanced.md) | Service discovery (Cloud Map), Service Connect, App Mesh (EOL), ECS Anywhere, advanced capacity provider strategies |
 | 2026-02-16 | [ECS Fundamentals](./2026/february/aws/2026-02-16-ecs-fundamentals.md) | Task definitions, services, capacity providers, Fargate vs EC2, deployment strategies |
 | 2026-02-12 | [Auto Scaling Deep Dive](./2026/february/aws/2026-02-12-auto-scaling-deep-dive.md) | Scaling policies (target tracking, step, simple), predictive scaling, warm pools & lifecycle hooks |
@@ -47,7 +48,7 @@ Organized by: `year/month/YYYY-MM-DD-topic.md`
 
 | Year | Entries | Topics |
 |------|---------|--------|
-| [2026](./2026/) | 23 | Docker (Networking, Storage, Multi-Stage Builds, Runtimes), Terraform (State, Modules, Workspaces, Functions, Data Sources, Providers, Variables, Outputs, Security, Testing, Cloud/Enterprise, Project Structure), AWS (EC2, EC2 Purchasing Options, EC2 Networking, Auto Scaling, ECS, ECS Advanced) |
+| [2026](./2026/) | 24 | Docker (Networking, Storage, Multi-Stage Builds, Runtimes), Terraform (State, Modules, Workspaces, Functions, Data Sources, Providers, Variables, Outputs, Security, Testing, Cloud/Enterprise, Project Structure), AWS (EC2, EC2 Purchasing Options, EC2 Networking, Auto Scaling, ECS, ECS Advanced, VPC Advanced) |
 | [2025](./2025/) | 10 | AWS (VPC, EKS, VPC CNI, Networking, IAM, Storage, Autoscaling, Security, Observability, Upgrades) |
 
 ---
