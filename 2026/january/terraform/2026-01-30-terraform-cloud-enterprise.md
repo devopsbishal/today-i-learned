@@ -31,6 +31,8 @@
 
 ## The Big Picture
 
+> **Note:** In April 2024, HashiCorp rebranded **Terraform Cloud** to **HCP Terraform**. You may see both names in documentation and tooling. This doc uses "Terraform Cloud" / "TFC" as the concepts and features remain the same.
+
 Imagine you're a **real estate developer** who builds infrastructure across multiple cities. Instead of hiring individual contractors and managing everything yourself, you partner with a **central architecture firm** that handles everything:
 
 ```
@@ -404,23 +406,25 @@ THREE ENFORCEMENT LEVELS:
 
 **Sentinel Policy Example:**
 
-```python
-# policy: no-public-s3-buckets.sentinel
+```sentinel
+# policy: require-tags.sentinel
 
 import "tfplan/v2" as tfplan
 
-# Find all S3 bucket resources in the plan
-s3_buckets = filter tfplan.resource_changes as _, rc {
-    rc.type is "aws_s3_bucket" and
+required_tags = ["Environment", "Owner", "CostCenter"]
+
+# Find all managed resources being created or updated
+all_resources = filter tfplan.resource_changes as _, rc {
     rc.mode is "managed" and
     (rc.change.actions contains "create" or rc.change.actions contains "update")
 }
 
-# Check that no bucket has public ACL
-no_public_buckets = rule {
-    all s3_buckets as _, bucket {
-        bucket.change.after.acl is not "public-read" and
-        bucket.change.after.acl is not "public-read-write"
+# Check that all required tags are present
+tags_present = rule {
+    all all_resources as _, resource {
+        all required_tags as tag {
+            resource.change.after.tags contains tag
+        }
     }
 }
 

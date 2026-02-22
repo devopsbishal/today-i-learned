@@ -10,6 +10,18 @@
 |----------------|----------------------------|
 | **Single-stage build** | Serving customers IN the kitchen (messy, unsafe, huge) |
 | **Multi-stage build** | Separate kitchen (builder) and dining room (runtime) |
+| **Builder stage** | The kitchen (all tools, makes a mess) |
+| **Runtime stage** | The dining room (clean, minimal, customer-facing) |
+| **COPY --from** | Plating the finished dish (kitchen to dining room) |
+| **ubuntu:22.04** | Full-service restaurant (77MB, everything) |
+| **alpine:3.19** | Casual dining (7MB, most common) |
+| **distroless** | Fine dining (2MB, curated, secure) |
+| **scratch** | Food truck (0MB, just the binary!) |
+| **Layer caching** | Prep station organization (stable ingredients first) |
+| **Three-stage pattern** | Prep kitchen + Cooking kitchen + Dining room |
+| **.dockerignore** | "Don't bring trash into the kitchen" |
+| **BuildKit cache mount** | Shared pantry that stays stocked between services |
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │    🏢 THE RESTAURANT BUILDING (Docker Build Process)    │
@@ -72,15 +84,7 @@
 - **Stage 2 (Runtime/Dining Room):** Copy ONLY the final artifacts, skip everything else
 - Final image: Clean, minimal, production-ready
 
-**Key Insight**: Just like you don't serve customers in the kitchen, you don't ship build tools to production deployment time |
-| **ubuntu:22.04** | Full-service restaurant (77MB, everything) |
-| **alpine:3.19** | Casual dining (7MB, most common) |
-| **distroless** | Fine dining (2MB, curated, secure) |
-| **scratch** | Food truck (0MB, just the binary!) |
-| **Layer caching** | Prep station organization (stable ingredients first) |
-| **Three-stage pattern** | Prep kitchen + Cooking kitchen + Dining room |
-| **.dockerignore** | "Don't bring trash into the kitchen" |
-| **BuildKit cache mount** | Shared pantry that stays stocked between services |
+**Key Insight**: Just like you don't serve customers in the kitchen, you don't ship build tools to production.
 
 
 ---

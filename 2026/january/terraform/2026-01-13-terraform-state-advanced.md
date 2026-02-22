@@ -16,7 +16,7 @@
 | `import` block | Acquisition form - declarative paperwork to adopt a building |
 | `terraform taint` (deprecated) | "Condemned" sticker - mark building for demolition next work order |
 | `-replace` flag | Demolish & rebuild order - single work order: tear down and rebuild |
-| `terraform refresh` (deprecated) | Send inspector to all buildings, update ledger immediately |
+| `terraform refresh` (not recommended) | Send inspector to all buildings, update ledger immediately |
 | `-refresh-only` | Inspector with approval - see inspection report before updating ledger |
 | State migration | Move ledger from desk drawer to central registry vault |
 | `-migrate-state` | Automated moving truck for your ledger |
@@ -759,7 +759,7 @@ Sometimes a resource is broken and needs complete recreation:
 ### Old Way: terraform taint (Deprecated ⚠️)
 
 ```bash
-# DON'T USE THIS - Deprecated!
+# Not recommended - use -refresh-only instead
 terraform taint aws_instance.web_server
 
 # What it did:
@@ -888,10 +888,10 @@ Someone made changes outside Terraform:
 - AWS auto-recovery changed something
 - Resource was deleted externally
 
-### Old Way: terraform refresh (Deprecated ⚠️)
+### Old Way: terraform refresh (Not Recommended ⚠️)
 
 ```bash
-# DON'T USE THIS - Deprecated!
+# Not recommended - use -refresh-only instead
 terraform refresh
 
 # What it did:
@@ -1230,7 +1230,7 @@ terraform init -migrate-state = Automated moving truck
 
 ### Syncing State
 12. **Use `-refresh-only`** - Preview before updating state
-13. **Avoid `terraform refresh`** - Deprecated, no preview
+13. **Avoid `terraform refresh`** - Not recommended, no preview of changes
 
 ### State Migration
 14. **`terraform init -migrate-state`** - Automated migration

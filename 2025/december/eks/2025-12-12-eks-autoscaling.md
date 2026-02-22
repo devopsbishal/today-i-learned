@@ -186,14 +186,13 @@ VPA gives workers **better equipment** instead of hiring more people.
 | **Off** | Just recommends, doesn't change anything. Recommendations stored in VPA `.status` | You want suggestions only, manual control |
 | **Initial** | Sets resources **only** when pods are first created. No updates to running pods | Use with HPA, or when restarts are expensive |
 | **Recreate** | Evicts pods when recommendations differ significantly, replacement gets new resources | Production workloads that can tolerate restarts |
-| **InPlaceOrRecreate** | Updates resources **without restarting** pod when possible, falls back to eviction if needed | Modern clusters with in-place resize support (least disruptive) |
-| **Auto** ⚠️ | **DEPRECATED** (v1.4.0+) - Now just an alias for Recreate mode | Use `Recreate` or `InPlaceOrRecreate` instead |
+| **Auto** | VPA decides the best update strategy based on cluster capabilities. Defaults to Recreate but may use in-place updates when available | Recommended default for most clusters |
 
 **Key Differences:**
 - **Off**: Read-only recommendations, zero automation
 - **Initial**: One-time setup at pod creation
 - **Recreate**: Active management via pod eviction (brief downtime per eviction)
-- **InPlaceOrRecreate**: Best of both worlds - resize without restart when possible (requires Kubernetes 1.27+ with InPlacePodVerticalScaling feature gate)
+- **Auto**: Recommended default - VPA picks the best strategy for your cluster
 
 ---
 
@@ -404,7 +403,7 @@ Instead of picking from **predefined templates**, Karpenter **custom-builds** th
 ### Karpenter's Intelligence
 
 ```yaml
-apiVersion: karpenter.sh/v1beta1
+apiVersion: karpenter.sh/v1
 kind: NodePool
 metadata:
   name: default

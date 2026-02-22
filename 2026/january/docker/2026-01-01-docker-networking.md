@@ -774,7 +774,7 @@ Let's follow an HTTPS request from the internet all the way to the database:
 │     "Visitor for Port 443? Go to Apt 172.18.0.2!"      │
 │        ↓                                                │
 │                                                         │
-│  4. 🌉 Internal Street (docker0 bridge)                │
+│  4. 🌉 Internal Street (custom bridge, e.g. br-abc123) │
 │     Switches packet to correct apartment                │
 │     Looks up: 172.18.0.2 → veth123abc                  │
 │        ↓                                                │
@@ -792,7 +792,7 @@ Let's follow an HTTPS request from the internet all the way to the database:
 │     "auth-service" → 172.19.0.5                         │
 │        ↓                                                │
 │                                                         │
-│  8. 🌉 Another hallway trip (docker0 again)            │
+│  8. 🌉 Another hallway trip (custom bridge again)      │
 │     But wait! Different network!                        │
 │     API Gateway has eth1 on app-net: 172.19.0.3        │
 │     Routes through that interface                       │

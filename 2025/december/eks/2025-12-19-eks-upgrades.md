@@ -631,7 +631,7 @@ aws eks update-addon \
 │     Ensure apps have PDBs for critical services            │
 │                                                             │
 │  ☐ 7. Backup Critical Data                                 │
-│     etcd backup, application data snapshots                │
+│     Kubernetes manifests (Velero), EBS snapshots, RDS data │
 │                                                             │
 │  ☐ 8. Plan Maintenance Window                              │
 │     Inform stakeholders, schedule low-traffic time         │
@@ -649,10 +649,11 @@ aws eks update-addon \
 
 ```bash
 # Install kube-no-trouble (kubent)
-kubectl krew install deprecations
+brew install kubent
+# OR: sh -c "$(curl -sSL https://git.io/install-kubent)"
 
 # Check for deprecated API usage
-kubectl deprecations
+kubent
 
 # Example output:
 # API: extensions/v1beta1/Ingress

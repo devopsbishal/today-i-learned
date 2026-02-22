@@ -377,8 +377,8 @@ terraform init
 # Update to latest compatible versions
 terraform init -upgrade
 
-# Update specific provider
-terraform init -upgrade=hashicorp/aws
+# Note: -upgrade upgrades ALL providers to latest compatible versions
+# To update only one provider, adjust version constraints in required_providers
 ```
 
 ---

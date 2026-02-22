@@ -53,7 +53,7 @@ Containers are **NOT magic virtual machines**. They're just **Linux processes wi
 └─────────────────────────────────────────────────────────┘
 ```
 
-**Key Insight**: Containers don't create new kernels. They make processes **believe** they're isolated using Linux features that have existed since 2008!
+**Key Insight**: Containers don't create new kernels. They make processes **believe** they're isolated using Linux features that have evolved since 2002 (mount namespaces), with most namespace types added between 2006-2016!
 
 ---
 
@@ -173,7 +173,7 @@ Without cgroups, one inmate could use all the electricity and leave everyone els
 ├── cpu/
 │   └── docker/
 │       └── <container-id>/
-│           └── cpu.shares  # 512 = 0.5 CPU
+│           └── cpu.shares  # 512 (relative weight, not absolute CPU)
 └── blkio/
     └── docker/
         └── <container-id>/
@@ -699,8 +699,8 @@ No vendor lock-in! 🎉
 
 ## Related Reading
 
-- [AWS VPC - The Compound Analogy](../november/2025-11-30-aws-vpc.md)
-- [AWS EKS - The Managed Office Building Analogy](./2025-12-02-aws-eks.md)
+- [AWS VPC - The Compound Analogy](../../november/aws-vpc/2025-11-30-aws-vpc.md)
+- [AWS EKS - The Managed Office Building Analogy](../eks/2025-12-02-aws-eks.md)
 
 ---
 

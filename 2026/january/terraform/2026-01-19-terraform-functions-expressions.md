@@ -114,6 +114,7 @@ All numbers shift down:
 # Creates: aws_instance.server[0], [1], [2], [3]
 resource "aws_instance" "server" {
   count         = 4
+  ami           = "ami-0c55b159cbfafe1f0"  # Amazon Linux 2023
   instance_type = "t3.micro"
   tags = {
     Name = "Server-${count.index}"  # Server-0, Server-1, Server-2, Server-3
@@ -157,6 +158,7 @@ SIMPLE REMOVAL! ✅
 # Creates: aws_instance.server["alice"], ["bob"], ["carol"], ["dave"]
 resource "aws_instance" "server" {
   for_each      = toset(["alice", "bob", "carol", "dave"])
+  ami           = "ami-0c55b159cbfafe1f0"  # Amazon Linux 2023
   instance_type = "t3.micro"
   tags = {
     Name = "Server-${each.key}"  # Server-alice, Server-bob, etc.
@@ -337,8 +339,9 @@ locals {
 # Now use with for_each (requires map or set!)
 resource "aws_instance" "server" {
   for_each      = local.instance_map
+  ami           = "ami-0c55b159cbfafe1f0"  # Amazon Linux 2023
   instance_type = each.value.type
-  
+
   tags = {
     Name = each.key
   }

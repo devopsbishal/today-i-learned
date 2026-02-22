@@ -608,9 +608,8 @@ git push origin main
 *.tfstate
 *.tfstate.*
 
-# Terraform directory
+# Terraform directory (but NOT .terraform.lock.hcl - commit that for consistent provider versions!)
 .terraform/
-.terraform.lock.hcl
 
 # Sensitive variable files
 *.tfvars

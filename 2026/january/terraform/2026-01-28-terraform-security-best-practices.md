@@ -439,7 +439,7 @@ THE TWO MAIN AUDITORS
 
 ┌─────────────────────────────────────────────────────────────────┐
 │                                                                 │
-│   tfsec (Now part of Trivy)                                     │
+│   tfsec (Deprecated - now absorbed into Trivy)                  │
 │   ─────────────────────────                                     │
 │                                                                 │
 │   🏃 QUICK FIRE CODE INSPECTOR                                  │
@@ -450,6 +450,8 @@ THE TWO MAIN AUDITORS
 │   • Custom rules via YAML/JSON                                  │
 │   • Great for pre-commit hooks (speed matters)                  │
 │   • Owned by Aqua Security                                      │
+│   • NOTE: tfsec has been deprecated and absorbed into Trivy.    │
+│     New projects should use `trivy config` instead.             │
 │                                                                 │
 │   ANALOGY: Quick walkthrough inspector                          │
 │            "I'll check fire exits and smoke detectors"          │
@@ -944,7 +946,7 @@ THE COMPLETE SECURITY FLOW
 │      │                                                          │
 │      │  main.tf:                                                │
 │      │  ┌─────────────────────────────────────────────────┐     │
-│      │  │ resource "aws_s3_bucket_server_side_encryption" │     │
+│      │  │ resource "aws_s3_bucket_server_side_encryption_configuration" │     │
 │      │  │   bucket = aws_s3_bucket.data.id                │     │
 │      │  │   rule {                                        │     │
 │      │  │     apply_server_side_encryption_by_default {   │     │

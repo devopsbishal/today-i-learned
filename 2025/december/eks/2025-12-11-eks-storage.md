@@ -487,7 +487,7 @@ EFS is like a **shared team room** - everyone has a key, access from anywhere.
 |--------|----------------------|-------------------|
 | **Access Mode** | ReadWriteOnce | ReadWriteMany |
 | **Multiple pods** | Same node only | Any node ✅ |
-| **Performance** | Higher (16,000 IOPS) | Lower (network FS) |
+| **Performance** | Higher (3,000 baseline, up to 16,000 IOPS) | Lower (network FS) |
 | **Latency** | Lower (block storage) | Higher (NFS protocol) |
 | **Cost** | $0.08/GB/month (gp3) | $0.30/GB/month |
 | **Use case** | Databases, single pod | Shared files, multi-pod |

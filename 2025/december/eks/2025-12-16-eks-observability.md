@@ -863,8 +863,8 @@ FluentBit is a lightweight log processor that collects, processes, and forwards 
 
 ### FluentBit Configuration Example
 
-```yaml
-# fluent-bit.conf
+```ini
+# fluent-bit.conf (INI/classic format -- FluentBit also supports YAML config)
 [SERVICE]
     Flush         5
     Log_Level     info

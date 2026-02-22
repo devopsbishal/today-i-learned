@@ -651,9 +651,14 @@ output "all_addresses" {
 Floor plans stored in your own office:
 
 ```hcl
+# Local module in same project
 module "vpc" {
-  source = "./modules/vpc"           # Same building
-  source = "../shared-modules/vpc"   # Down the hall
+  source = "./modules/vpc"
+}
+
+# Local module from a sibling directory
+module "vpc_shared" {
+  source = "../shared-modules/vpc"
 }
 ```
 

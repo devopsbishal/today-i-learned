@@ -618,7 +618,7 @@ Different construction companies following the same building code (OCI):
 **Example - Podman:**
 - No daemon (no General Contractor!)
 - You directly talk to a lightweight coordinator
-- Still uses containerd concepts
+- Does NOT use containerd -- uses conmon (container monitor) instead
 - Still uses runc or crun for actual building
 - Uses buildah for custom blueprints (docker build equivalent)
 
@@ -734,7 +734,7 @@ A: Same reason you don't have one person in a company do everything:
 ## Related Reading
 
 - [Containers Fundamentals - The Prison Analogy](./2025-12-23-containers-fundamentals.md)
-- [AWS EKS - The Managed Office Building Analogy](./2025-12-02-aws-eks.md)
+- [AWS EKS - The Managed Office Building Analogy](../eks/2025-12-02-aws-eks.md)
 
 ---
 

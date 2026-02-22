@@ -141,26 +141,27 @@ kind: Namespace
 metadata:
   name: production
   labels:
-    # Enforce restricted level - reject violations
-    pod-security.kubernetes.io/enforce: restricted
+    # Enforce baseline - reject clearly dangerous pods
+    pod-security.kubernetes.io/enforce: baseline
     pod-security.kubernetes.io/enforce-version: latest
-    
-    # Warn about baseline violations
-    pod-security.kubernetes.io/warn: baseline
+
+    # Warn about restricted violations - prepare for tightening
+    pod-security.kubernetes.io/warn: restricted
     pod-security.kubernetes.io/warn-version: latest
-    
-    # Audit privileged violations (log only)
-    pod-security.kubernetes.io/audit: privileged
+
+    # Audit restricted violations - log for review
+    pod-security.kubernetes.io/audit: restricted
     pod-security.kubernetes.io/audit-version: latest
 ```
 
-**What happens:**
+**What happens with a pod using hostPath mount:**
 ```
-Pod with hostPath mount → 
-  ❌ REJECTED (violates restricted)
-  ⚠️ Warning would show (violates baseline)  
-  📝 Logged (violates privileged rules)
+  ❌ REJECTED (violates baseline enforce level)
+  ⚠️ Warning shown (would also violate restricted)
+  📝 Logged in audit (violates restricted rules)
 ```
+
+> **Pattern**: Enforce at a lower level (baseline), warn/audit at a stricter level (restricted). This lets you gradually tighten security without breaking existing workloads.
 
 ---
 

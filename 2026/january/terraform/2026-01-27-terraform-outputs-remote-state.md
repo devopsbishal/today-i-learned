@@ -461,11 +461,11 @@ COMPLETE OUTPUT & REMOTE STATE FLOW
 │  2. Use outputs in resources                                 │
 │     ┌─────────────────────────────────────┐                  │
 │     │ resource "aws_instance" "app" {     │                  │
-│     │   vpc_id    = data.terraform_remote │                  │
-│     │               _state.net.outputs    │                  │
-│     │               .vpc_id               │                  │
-│     │                                     │                  │
 │     │   subnet_id = data.terraform_remote │                  │
+│     │               _state.net.outputs    │                  │
+│     │               .private_subnet_ids[0]│                  │
+│     │                                     │                  │
+│     │   vpc_id    = data.terraform_remote │  # for tags only │
 │     │               _state.net.outputs    │                  │
 │     │               .private_subnet_ids[0]│                  │
 │     │ }                                   │                  │

@@ -210,7 +210,7 @@ Like using an **external badge authority** (OIDC Provider) to verify employee ba
 │     │ Issuer: oidc.eks.us-east-1.../ABC123       │            │
 │     │ Subject: system:serviceaccount:            │            │
 │     │          production:payment-sa             │            │
-│     │ Expires: 24 hours                          │            │
+│     │ Expires: 1 hour (auto-refreshed by kubelet) │            │
 │     └─────────────────────────────────────────────┘            │
 │                                                                 │
 │  3. AWS SDK in pod calls STS:                                  │

@@ -97,12 +97,14 @@ Each room (node) has **phone panels (ENIs)** on the wall. Each panel has limited
 
 Different room sizes (instance types) have different phone panel capacities:
 
-| Room Size | Max Panels | Slots/Panel | Total Extensions | Desks Possible |
-|-----------|------------|-------------|------------------|----------------|
-| t3.small | 3 | 4 | 12 | **11** (12 - 1 for room) |
-| t3.large | 3 | 12 | 36 | **35** |
-| m5.large | 3 | 10 | 30 | **29** |
-| m5.xlarge | 4 | 15 | 60 | **58** |
+| Room Size | Max Panels (ENIs) | Slots/Panel (IPs) | Total Slots | Desks Possible |
+|-----------|-------------------|-------------------|-------------|----------------|
+| t3.small | 3 | 4 | 12 | **9** (12 - 3 ENI primary IPs) |
+| t3.large | 3 | 12 | 36 | **33** (36 - 3) |
+| m5.large | 3 | 10 | 30 | **27** (30 - 3) |
+| m5.xlarge | 4 | 15 | 60 | **56** (60 - 4) |
+
+> **Formula**: `(maxENIs × maxIPsPerENI) - maxENIs`. Each ENI's primary IP is reserved for the node itself, so you subtract one per ENI, not just one total.
 
 ### The Problem
 
@@ -112,7 +114,7 @@ Different room sizes (instance types) have different phone panel capacities:
 │                                                             │
 │   CPU:  ████████░░░░░░░░░░░░ 40% used                      │
 │   RAM:  ██████░░░░░░░░░░░░░░ 30% used                      │
-│   Extensions: ████████████████████ 100% used (11/11)       │
+│   Extensions: ████████████████████ 100% used (9/9)         │
 │                                                             │
 │   ❌ Cannot add more desks!                                 │
 │   💸 Wasting 60% CPU and 70% RAM                           │
@@ -160,8 +162,10 @@ Phone Panel:
 
 | Mode | Calculation | Max Desks |
 |------|-------------|-----------|
-| **Default** | (3 ENIs × 4 IPs) - 1 | **11 desks** |
-| **Prefix Delegation** | (3 ENIs × 4 slots × 16 IPs) - 1 | **~110 desks** |
+| **Default** | (3 ENIs × 4 IPs) - 3 | **9 desks** |
+| **Prefix Delegation** | (3 ENIs × 4 slots × 16 IPs) - 3 | **~189 desks** |
+
+> **Note**: With prefix delegation, `max-pods` and CPU/memory will likely be the actual bottleneck before IP addresses.
 
 **10x more desks on the same room!** 🚀
 
