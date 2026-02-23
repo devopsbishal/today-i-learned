@@ -27,6 +27,7 @@ Organized by: `year/month/YYYY-MM-DD-topic.md`
 
 | Date | Topic | Description |
 |------|-------|-------------|
+| 2026-02-23 | [Transit Gateway Deep Dive](./2026/february/aws/2026-02-23-transit-gateway-deep-dive.md) | TGW architecture (ENIs, /28 subnets), 5 attachment types, route table mechanics (association vs propagation), network segmentation, centralized egress, centralized inspection with appliance mode, GWLB integration, inter-region peering, multi-account RAM sharing, cost model, key quotas |
 | 2026-02-20 | [VPC Peering vs Transit Gateway vs PrivateLink](./2026/february/aws/2026-02-20-vpc-peering-vs-transit-gateway.md) | VPC Peering limitations (transitive routing, edge-to-edge, full mesh scaling), Transit Gateway architecture (route tables, associations, propagations, segmentation), PrivateLink provider-consumer model, cost comparison, decision framework |
 | 2026-02-19 | [VPC Advanced: CIDR Planning & Subnet Strategy](./2026/february/aws/2026-02-19-vpc-advanced-cidr-subnet-strategy.md) | CIDR planning for 10+ VPCs, subnet tiers (public/private/isolated), route table design, Regional NAT Gateway, VPC endpoints, IPAM |
 | 2026-02-17 | [ECS Advanced](./2026/february/aws/2026-02-17-ecs-advanced.md) | Service discovery (Cloud Map), Service Connect, App Mesh (EOL), ECS Anywhere, advanced capacity provider strategies |
@@ -49,7 +50,7 @@ Organized by: `year/month/YYYY-MM-DD-topic.md`
 
 | Year | Entries | Topics |
 |------|---------|--------|
-| [2026](./2026/) | 25 | Docker (Networking, Storage, Multi-Stage Builds, Runtimes), Terraform (State, Modules, Workspaces, Functions, Data Sources, Providers, Variables, Outputs, Security, Testing, Cloud/Enterprise, Project Structure), AWS (EC2, EC2 Purchasing Options, EC2 Networking, Auto Scaling, ECS, ECS Advanced, VPC Advanced, VPC Peering vs Transit Gateway) |
+| [2026](./2026/) | 26 | Docker (Networking, Storage, Multi-Stage Builds, Runtimes), Terraform (State, Modules, Workspaces, Functions, Data Sources, Providers, Variables, Outputs, Security, Testing, Cloud/Enterprise, Project Structure), AWS (EC2, EC2 Purchasing Options, EC2 Networking, Auto Scaling, ECS, ECS Advanced, VPC Advanced, VPC Peering vs Transit Gateway, Transit Gateway Deep Dive) |
 | [2025](./2025/) | 10 | AWS (VPC, EKS, VPC CNI, Networking, IAM, Storage, Autoscaling, Security, Observability, Upgrades) |
 
 ---
