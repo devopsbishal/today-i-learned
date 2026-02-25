@@ -27,6 +27,7 @@ Organized by: `year/month/YYYY-MM-DD-topic.md`
 
 | Date | Topic | Description |
 |------|-------|-------------|
+| 2026-02-25 | [AWS Site-to-Site VPN](./2026/february/aws/2026-02-25-aws-site-to-site-vpn.md) | IPSec tunnel fundamentals, Customer Gateway (CGW), VGW vs TGW termination, static vs dynamic (BGP) routing, VPN CloudHub multi-site, Accelerated VPN (Global Accelerator), dual-tunnel HA, redundant CGW pattern, ECMP bandwidth aggregation on TGW, DX vs VPN decision matrix, CloudWatch monitoring and troubleshooting |
 | 2026-02-24 | [AWS Direct Connect](./2026/february/aws/2026-02-24-aws-direct-connect.md) | Dedicated vs Hosted connections, Private/Public/Transit VIFs, Direct Connect Gateway (multi-VPC, multi-region), LAG, BGP communities for failover, three resiliency models (dev/test, high, maximum), MACsec encryption, SiteLink, DX + TGW integration via Transit VIF + DXGW, DX vs VPN trade-offs |
 | 2026-02-23 | [Transit Gateway Deep Dive](./2026/february/aws/2026-02-23-transit-gateway-deep-dive.md) | TGW architecture (ENIs, /28 subnets), 5 attachment types, route table mechanics (association vs propagation), network segmentation, centralized egress, centralized inspection with appliance mode, GWLB integration, inter-region peering, multi-account RAM sharing, cost model, key quotas |
 | 2026-02-20 | [VPC Peering vs Transit Gateway vs PrivateLink](./2026/february/aws/2026-02-20-vpc-peering-vs-transit-gateway.md) | VPC Peering limitations (transitive routing, edge-to-edge, full mesh scaling), Transit Gateway architecture (route tables, associations, propagations, segmentation), PrivateLink provider-consumer model, cost comparison, decision framework |
@@ -51,7 +52,7 @@ Organized by: `year/month/YYYY-MM-DD-topic.md`
 
 | Year | Entries | Topics |
 |------|---------|--------|
-| [2026](./2026/) | 27 | Docker (Networking, Storage, Multi-Stage Builds, Runtimes), Terraform (State, Modules, Workspaces, Functions, Data Sources, Providers, Variables, Outputs, Security, Testing, Cloud/Enterprise, Project Structure), AWS (EC2, EC2 Purchasing Options, EC2 Networking, Auto Scaling, ECS, ECS Advanced, VPC Advanced, VPC Peering vs Transit Gateway, Transit Gateway Deep Dive, Direct Connect) |
+| [2026](./2026/) | 28 | Docker (Networking, Storage, Multi-Stage Builds, Runtimes), Terraform (State, Modules, Workspaces, Functions, Data Sources, Providers, Variables, Outputs, Security, Testing, Cloud/Enterprise, Project Structure), AWS (EC2, EC2 Purchasing Options, EC2 Networking, Auto Scaling, ECS, ECS Advanced, VPC Advanced, VPC Peering vs Transit Gateway, Transit Gateway Deep Dive, Direct Connect, Site-to-Site VPN) |
 | [2025](./2025/) | 10 | AWS (VPC, EKS, VPC CNI, Networking, IAM, Storage, Autoscaling, Security, Observability, Upgrades) |
 
 ---

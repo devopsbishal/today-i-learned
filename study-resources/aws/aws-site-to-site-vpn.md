@@ -1,0 +1,71 @@
+# AWS Site-to-Site VPN -- 2-Hour Study Plan
+
+**Total Time:** ~120 minutes
+**Created:** 2026-02-25
+**Difficulty:** Intermediate-Advanced
+
+## Overview
+
+This study plan covers AWS Site-to-Site VPN end-to-end: the IPSec tunnel architecture and dual-tunnel design, Customer Gateway and Virtual Private Gateway components, VPN termination on Transit Gateway with ECMP for bandwidth aggregation, static vs dynamic (BGP) routing, VPN CloudHub for multi-site connectivity, Accelerated VPN using Global Accelerator, high-availability patterns with redundant customer gateways, monitoring with CloudWatch metrics and tunnel logs, and the critical Direct Connect vs VPN comparison for hybrid connectivity decisions. After completing it, you will be able to design a resilient hybrid connectivity architecture that uses VPN as a standalone solution or as an encrypted backup for the Direct Connect topology you studied yesterday, explain when to terminate VPN on a VGW vs Transit Gateway, and troubleshoot tunnel failures using CloudWatch metrics and connection logs. This plan assumes you already understand VPC route tables, Transit Gateway association/propagation mechanics, TGW attachment types, and Direct Connect architecture from the past four days.
+
+## Resources
+
+### 1. How AWS Site-to-Site VPN Works -- Official User Guide ⏱️ 15 min
+- **URL:** https://docs.aws.amazon.com/vpn/latest/s2svpn/how_it_works.html
+- **Type:** Official Docs
+- **Summary:** The foundational reference that establishes the three core components (Virtual Private Gateway or Transit Gateway on the AWS side, Customer Gateway resource in AWS representing your on-premises device, and the physical customer gateway device itself) and how they connect via two redundant IPSec tunnels. Covers the key architectural distinction between VGW-terminated VPN (attaches to a single VPC, no IPv6 support, no ECMP) and TGW-terminated VPN (connects to thousands of VPCs, supports IPv4 and IPv6 inner/outer tunnel addresses, supports ECMP). Also explains that AWS provides two tunnel endpoints in different AZs for built-in redundancy, and that the customer gateway device initiates IKE negotiation by default. Read this first to build the correct mental model before diving into routing, HA, and advanced features.
+
+### 2. Site-to-Site VPN Routing Options -- Static vs Dynamic (BGP) ⏱️ 20 min
+- **URL:** https://docs.aws.amazon.com/vpn/latest/s2svpn/VPNRoutingTypes.html
+- **Type:** Official Docs
+- **Summary:** The detailed reference for the two routing approaches that determine how traffic flows between your on-premises network and AWS. Static routing requires you to manually specify the IP prefixes for your remote network (limited to 100 routes on VGW, 1000 on TGW) and does not support automatic failover or ECMP. Dynamic routing uses BGP peering between your customer gateway device and the AWS VPN endpoint, enabling automatic route exchange, liveness detection for failover, and the ability to influence path selection through AS_PATH prepending and MED values. Critical detail: static routes take precedence over BGP-advertised routes when identical routes exist on a VGW, and ECMP on Transit Gateway requires dynamic routing -- it does not work with static. Also covers route propagation (enabling your VPC route table to automatically learn VPN routes), route priority during tunnel endpoint updates, and IPv4/IPv6 routing behavior. AWS strongly recommends BGP-capable devices for production deployments.
+
+### 3. VPN in Multi-VPC Network Infrastructure -- AWS Whitepaper ⏱️ 25 min
+- **URL:** https://docs.aws.amazon.com/whitepapers/latest/building-scalable-secure-multi-vpc-network-infrastructure/vpn.html
+- **Type:** Official Docs (Whitepaper)
+- **Summary:** The architecture decision guide that presents five options for VPN connectivity in a multi-VPC environment, directly paralleling the Direct Connect multi-VPC whitepaper you read yesterday. Option 1 (recommended): Transit Gateway VPN -- centralizes IPSec termination at TGW, supports ECMP for bandwidth aggregation beyond 1.25 Gbps per tunnel, scales to thousands of VPCs. Option 2: EC2-based VPN -- for specific vendor features like Cisco DMVPN or GRE tunnels, but you manage HA yourself. Option 3: VGW per VPC -- one VPN connection per VPC, simple but does not scale (no ECMP, no transit routing). Option 4: Client VPN -- managed OpenVPN/TLS service for individual user remote access, not site-to-site. Option 5: Cloud WAN -- policy-driven VPN configuration similar to TGW but with global network management. This is where you connect yesterday's Transit Gateway knowledge with today's VPN topic -- the TGW VPN attachment is one of the five attachment types you already studied, and ECMP is the key differentiator over VGW.
+
+### 4. Redundant VPN Connections and High Availability ⏱️ 15 min
+- **URL:** https://docs.aws.amazon.com/vpn/latest/s2svpn/vpn-redundant-connection.html
+- **Type:** Official Docs
+- **Summary:** The reference for designing VPN high availability beyond the built-in dual-tunnel redundancy. Each VPN connection already provides two tunnels terminating in different AZs, but if your single on-premises customer gateway device fails, both tunnels go down. The solution: create a second VPN connection from a second customer gateway device to the same VGW or TGW, giving you four tunnels total across two independent on-premises devices. With BGP dynamic routing, both devices advertise the same prefixes, and failover is automatic -- if one device fails, BGP detects the peer as dead and traffic reroutes to the surviving device. With static routing, failover requires manual intervention, reinforcing why AWS recommends BGP for production. This pattern mirrors the Direct Connect maximum resiliency model (dual connections at dual locations) but applied to VPN -- the design principle of eliminating single points of failure is identical.
+
+### 5. VPN CloudHub -- Multi-Site Connectivity ⏱️ 10 min
+- **URL:** https://docs.aws.amazon.com/vpn/latest/s2svpn/VPN_CloudHub.html
+- **Type:** Official Docs
+- **Summary:** The reference for using a single VGW as a hub to connect multiple branch offices in a hub-and-spoke topology. Each branch office establishes a VPN connection to the same VGW using a unique BGP ASN, and the VGW re-advertises each site's routes to all other sites -- enabling branch-to-branch communication through the AWS backbone without requiring direct links between offices. Critical requirements: each site must use a unique BGP ASN (so CloudHub requires dynamic routing), and IP ranges must not overlap between sites. You can mix VPN and Direct Connect connections on the same VGW, so your headquarters might use DX while branch offices use VPN, all communicating through CloudHub. This is a cost-effective alternative to Transit Gateway for small deployments (fewer than 5-10 sites), but for larger deployments TGW provides better scalability, ECMP support, and centralized route table management.
+
+### 6. Accelerated Site-to-Site VPN and TGW+VPN Whitepaper ⏱️ 20 min
+- **URL:** https://docs.aws.amazon.com/vpn/latest/s2svpn/accelerated-vpn.html
+- **Type:** Official Docs
+- **Summary:** Start with this page on Accelerated VPN, then follow the link to the TGW+VPN connectivity options whitepaper (https://docs.aws.amazon.com/whitepapers/latest/aws-vpc-connectivity-options/aws-transit-gateway-vpn.html). Accelerated VPN routes traffic from your on-premises network to the nearest AWS edge location via AWS Global Accelerator, then traverses the congestion-free AWS global backbone instead of the public internet -- reducing jitter, packet loss, and latency variability. Key constraints: Accelerated VPN only works with Transit Gateway (not VGW), AWS creates and manages two accelerators (one per tunnel) that you cannot see in the Global Accelerator console, and it adds a Global Accelerator hourly charge plus data transfer premium on top of standard VPN pricing. The TGW+VPN whitepaper complements this by covering the full architecture: ECMP across multiple VPN connections for bandwidth aggregation, IPv4/IPv6 support, and the recommendation to use Accelerated VPN when your on-premises location is geographically distant from your target AWS Region.
+
+### 7. Scaling VPN Throughput Using AWS Transit Gateway -- AWS Blog ⏱️ 15 min
+- **URL:** https://aws.amazon.com/blogs/networking-and-content-delivery/scaling-vpn-throughput-using-aws-transit-gateway/
+- **Type:** Blog (AWS Official)
+- **Summary:** A practical deep-dive into ECMP-based bandwidth aggregation that goes beyond what the docs cover. Each VPN tunnel provides up to 1.25 Gbps (recently increased to 5 Gbps for new tunnel types). With VGW, you are limited to a single VPN connection with two tunnels -- no aggregation possible. With Transit Gateway and ECMP enabled, you can create multiple VPN connections to the same TGW, and traffic is distributed across all tunnels using a 5-tuple hash (source IP, destination IP, source port, destination port, protocol). This means 4 VPN connections with 8 tunnels can theoretically deliver 10 Gbps of aggregate throughput. The blog covers the step-by-step architecture, ECMP configuration requirements (dynamic routing is mandatory), how the hash function distributes flows, and real-world considerations like single-flow bandwidth still being limited to one tunnel's capacity. Also read the companion announcement about 5 Gbps tunnels (https://aws.amazon.com/blogs/networking-and-content-delivery/introducing-aws-site-to-site-vpn-5-gbps-tunnels-to-support-high-throughput-workloads/) if time allows.
+
+### 8. Monitoring VPN Tunnels with CloudWatch ⏱️ 10 min
+- **URL:** https://docs.aws.amazon.com/vpn/latest/s2svpn/monitoring-cloudwatch-vpn.html
+- **Type:** Official Docs
+- **Summary:** The reference for operational monitoring of VPN connections. Covers the four key CloudWatch metrics: TunnelState (0=DOWN, 1=UP for static; 1=ESTABLISHED for BGP, with fractional values indicating partial availability), TunnelDataIn (bytes received after decryption), TunnelDataOut (bytes sent before encryption), and ConcentratorBandwidthUsage (bits per second for VPN Concentrator connections). Metrics are filterable by VpnId and TunnelIpAddress dimensions, and data is retained for 15 months. The critical operational practice: create CloudWatch alarms on TunnelState to detect when a tunnel drops, because a single-tunnel-down state means you have lost redundancy even though traffic still flows on the surviving tunnel. Also skim the VPN connection logs page (https://docs.aws.amazon.com/vpn/latest/s2svpn/monitoring-logs.html) to understand how IKE negotiation failures, DPD timeouts, and BGP state changes are captured in CloudWatch Logs for troubleshooting.
+
+## Study Tips
+
+- **Draw the VGW vs TGW termination architectures side by side.** On the left, draw a single VPC with a VGW and two tunnels to one CGW device -- label it with the limitations (no ECMP, no IPv6, single VPC only, 1.25 Gbps max). On the right, draw a TGW hub with multiple VPC attachments and multiple VPN connections using ECMP -- label it with the capabilities (ECMP aggregation, IPv4/IPv6, thousands of VPCs, Accelerated VPN support). This comparison will be your go-to interview answer for "when would you use VGW vs TGW for VPN?"
+
+- **Build a hybrid connectivity decision matrix that ties together the entire week.** Create a table with columns for Direct Connect, Site-to-Site VPN, DX + VPN backup, and VPN over DX (private IP VPN). Rows should include: setup time, bandwidth, encryption, cost model, HA model, and use case. This synthesizes Day 4 and Day 5 into one framework. Key insight: DX provides consistent performance but takes weeks to provision and costs more; VPN is encrypted by default, deploys in minutes, but traverses the public internet with variable performance. The best-practice production pattern is DX as primary with VPN as encrypted backup, using BGP communities to control failover (7224:7300 on DX, lower preference on VPN).
+
+- **Trace the packet path for Accelerated VPN vs standard VPN.** For standard VPN, the packet goes: on-prem router -> ISP -> public internet (multiple hops) -> AWS VPN endpoint in the Region. For Accelerated VPN, the packet goes: on-prem router -> ISP -> nearest AWS edge location (Global Accelerator anycast IP) -> AWS global backbone -> AWS VPN endpoint in the Region. The difference is that the second path minimizes time spent on the unpredictable public internet. This is the same principle behind CloudFront and Global Accelerator, which you will study in Week 3.
+
+## Next Steps
+
+After completing this study plan, consider exploring:
+
+1. **AWS Organizations and SCPs (Week 2, Day 1)** -- Moving from networking to security. The multi-account strategy you will learn next week determines how VPN connections are shared across accounts: the networking account owns the TGW and VPN attachments, shared via RAM to spoke accounts, exactly like you learned with Direct Connect + TGW this week.
+
+2. **Route53 Hybrid DNS (Week 3, Day 2)** -- The missing piece for hybrid architectures. Your VPN connection provides the IP-level path between on-premises and AWS, but without Route53 Resolver Inbound/Outbound endpoints, on-premises servers cannot resolve AWS private hosted zone DNS names and vice versa. DNS resolution is what makes hybrid connectivity usable for applications, not just for ping tests.
+
+3. **Hands-on Terraform build** -- This evening's Block 5 session. Use the `aws_vpn_gateway`, `aws_customer_gateway`, and `aws_vpn_connection` Terraform resources to build a VPN connection to a VGW. If you want to simulate an on-premises environment, create a second VPC with a software VPN appliance (e.g., strongSwan on EC2) acting as the customer gateway device. This gives you practical experience with the configuration file AWS generates and the IPSec/BGP negotiation process.
+
+4. **DX + VPN backup architecture** -- Design the combined pattern where Direct Connect is the primary path and Site-to-Site VPN is the encrypted backup. Use BGP local preference to ensure DX is always preferred when available, with automatic failover to VPN when DX goes down. This is a common interview scenario that tests your understanding of both services from this week.
