@@ -1083,10 +1083,10 @@ COMPARISON TABLE — VPC PEERING vs TRANSIT GATEWAY vs PRIVATELINK
   TRANSIT GATEWAY:
   ├── Hourly cost:           $0.05/attachment/hour
   │                          (10 VPCs = $0.50/hr = $365/month)
-  ├── Data transfer:         $0.01/GB (same-region, cross-AZ)
   ├── Per-GB processing:     $0.02/GB (TGW data processing charge)
-  └── 10 VPCs, 1 TB/month:  $365 (attachments) + $20 (processing)
-                             + $10 (data transfer) = $395/month
+  ├── Cross-AZ transfer:     $0.01/GB (standard AWS charge, not TGW-specific)
+  └── 10 VPCs, 1 TB/month:  $365 (attachments) + $20 (processing) = $385/month
+                             (+ $10 cross-AZ if traffic crosses AZs)
 
   PRIVATELINK:
   ├── Hourly cost:           $0.01/endpoint/AZ/hour
