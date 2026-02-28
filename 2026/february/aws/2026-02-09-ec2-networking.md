@@ -867,8 +867,8 @@ NETWORKING COMPARISON SUMMARY:
                     ENI           ENA            ENA Express     EFA
                     (base)        (enhanced)     (SRD)           (fabric)
                     ──────        ──────────     ───────────     ────────
-What it is          Virtual NIC   SR-IOV driver  Multi-path      OS-bypass
-                                                 protocol        adapter
+What it is          Virtual NIC   SR-IOV adapter Multi-path      OS-bypass
+                                  (physical HW)  protocol        adapter
 
 Max Throughput      Depends on    Up to 100      Up to 100       Up to 3200
                     instance      Gbps/adapter   Gbps/adapter    Gbps (multi-card)
