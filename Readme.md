@@ -27,6 +27,7 @@ Organized by: `year/month/YYYY-MM-DD-topic.md`
 
 | Date | Topic | Description |
 |------|-------|-------------|
+| 2026-03-03 | [AWS Control Tower & Landing Zones](./2026/march/aws/2026-03-03-aws-control-tower-landing-zones.md) | Control Tower as orchestration layer on Organizations, landing zone setup (Security OU, Log Archive, Audit accounts), three control behaviors (preventive/SCPs, detective/Config Rules, proactive/CloudFormation Hooks), three guidance levels (mandatory, strongly recommended, elective), Account Factory provisioning, Account Factory for Terraform (AFT) GitOps pipeline, drift detection, StackSets deployment mechanism, Control Tower vs manual Organizations comparison |
 | 2026-03-02 | [AWS Organizations & SCPs](./2026/march/aws/2026-03-02-aws-organizations-scps.md) | Organization structure (management account, OUs, root), multi-account strategy (Security/Infrastructure/Workloads/Sandbox OUs), SCP mechanics (permission ceilings, not grants), SCP evaluation logic (Allow intersection, Deny inheritance), deny-list vs allow-list strategy, real-world SCP examples (deny root, restrict regions, enforce encryption, prevent leaving org), SCPs vs Permission Boundaries vs IAM Policies, cross-account access patterns, delegated administrator, consolidated billing, Terraform examples |
 | 2026-02-25 | [AWS Site-to-Site VPN](./2026/february/aws/2026-02-25-aws-site-to-site-vpn.md) | IPSec tunnel fundamentals, Customer Gateway (CGW), VGW vs TGW termination, static vs dynamic (BGP) routing, VPN CloudHub multi-site, Accelerated VPN (Global Accelerator), dual-tunnel HA, redundant CGW pattern, ECMP bandwidth aggregation on TGW, DX vs VPN decision matrix, CloudWatch monitoring and troubleshooting |
 | 2026-02-24 | [AWS Direct Connect](./2026/february/aws/2026-02-24-aws-direct-connect.md) | Dedicated vs Hosted connections, Private/Public/Transit VIFs, Direct Connect Gateway (multi-VPC, multi-region), LAG, BGP communities for failover, three resiliency models (dev/test, high, maximum), MACsec encryption, SiteLink, DX + TGW integration via Transit VIF + DXGW, DX vs VPN trade-offs |
@@ -53,7 +54,7 @@ Organized by: `year/month/YYYY-MM-DD-topic.md`
 
 | Year | Entries | Topics |
 |------|---------|--------|
-| [2026](./2026/) | 29 | Docker (Networking, Storage, Multi-Stage Builds, Runtimes), Terraform (State, Modules, Workspaces, Functions, Data Sources, Providers, Variables, Outputs, Security, Testing, Cloud/Enterprise, Project Structure), AWS (EC2, EC2 Purchasing Options, EC2 Networking, Auto Scaling, ECS, ECS Advanced, VPC Advanced, VPC Peering vs Transit Gateway, Transit Gateway Deep Dive, Direct Connect, Site-to-Site VPN, Organizations & SCPs) |
+| [2026](./2026/) | 30 | Docker (Networking, Storage, Multi-Stage Builds, Runtimes), Terraform (State, Modules, Workspaces, Functions, Data Sources, Providers, Variables, Outputs, Security, Testing, Cloud/Enterprise, Project Structure), AWS (EC2, EC2 Purchasing Options, EC2 Networking, Auto Scaling, ECS, ECS Advanced, VPC Advanced, VPC Peering vs Transit Gateway, Transit Gateway Deep Dive, Direct Connect, Site-to-Site VPN, Organizations & SCPs, Control Tower & Landing Zones) |
 | [2025](./2025/) | 10 | AWS (VPC, EKS, VPC CNI, Networking, IAM, Storage, Autoscaling, Security, Observability, Upgrades) |
 
 ---
