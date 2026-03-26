@@ -814,7 +814,7 @@ PRODUCTION S3 ARCHITECTURE -- DATA LIFECYCLE WITH CROSS-REGION DR
 
 ## Key Takeaways
 
-- **All eight S3 storage classes have 11 9s durability** -- what varies is availability, retrieval time, and cost. One Zone-IA is the only class that stores data in a single AZ, making it unsuitable for irreplaceable data.
+- **All eight S3 storage classes have 11 9s durability** -- what varies is availability, retrieval time, and cost. Two classes store data in a single AZ: **One Zone-IA** (cheaper infrequent-access storage) and **S3 Express One Zone** (ultra-low-latency directory buckets co-located with compute). Both are unsuitable for irreplaceable data since an AZ loss destroys the only copy.
 
 - **Intelligent-Tiering is the "set it and forget it" class** but has a monitoring fee that makes it expensive for buckets with millions of known-cold objects. Use Glacier directly when you know the access pattern.
 
