@@ -189,6 +189,70 @@ def update_product(product_id, new_data):
 - **Wasted memory**: Data that is written but never read still occupies cache space
 - **Useless without reads**: If the cache key is never read between writes, the write-through work is pure waste
 
+### Strategy 3: TTL-Based Expiration (Adding a Freshness Sticker to Everything)
+
+**The analogy**: Every item placed on the deli counter gets a **freshness sticker** with an expiration time. Turkey sandwich made at 9 AM gets a sticker that says "discard after 10 AM." When 10 AM arrives, the staff sweeps it off the counter -- regardless of whether anyone asked for it or whether the kitchen changed the recipe. The next customer who wants turkey triggers a fresh batch from the kitchen. This is not about *how* the sandwich got on the counter (lazy loading or write-through put it there) -- it is about ensuring nothing sits there forever and goes stale.
+
+**How it works:**
+
+```python
+# TTL as a standalone strategy: every cache write includes an expiration
+def cache_with_ttl(key, fetch_fn, ttl_seconds):
+    cached = redis.get(key)
+    if cached:
+        return json.loads(cached)  # Cache HIT -- still fresh
+
+    # Cache MISS or TTL expired -- fetch from source
+    data = fetch_fn()
+
+    # Set with TTL -- Redis automatically evicts after ttl_seconds
+    redis.setex(key, ttl_seconds, json.dumps(data))
+    return data
+
+# Different TTLs for different staleness tolerances:
+# Rapidly changing data (stock prices, scores): 5-30 seconds
+product_price = cache_with_ttl("price:AMZN", fetch_stock_price, ttl_seconds=10)
+
+# Moderately changing data (product catalog, user profiles): 5-60 minutes
+product = cache_with_ttl("product:42", fetch_product, ttl_seconds=900)
+
+# Rarely changing data (config, feature flags): 1-24 hours
+config = cache_with_ttl("config:app", fetch_config, ttl_seconds=86400)
+
+# Session data: TTL = session timeout
+session = cache_with_ttl(f"session:{sid}", fetch_session, ttl_seconds=1800)
+```
+
+**Why TTL is the universal safety net:**
+
+```
+WITHOUT TTL                          WITH TTL
+═══════════════════════               ═══════════════════════
+Write-through fails silently?         Write-through fails silently?
+─▶ Stale data FOREVER                ─▶ Stale data for max TTL duration
+                                        then auto-corrected on next miss
+Cache key orphaned after              Cache key orphaned after
+DB row deleted?                       DB row deleted?
+─▶ Ghost data FOREVER                ─▶ Ghost data evicted after TTL
+
+Bug writes wrong value to cache?      Bug writes wrong value to cache?
+─▶ Wrong data until someone           ─▶ Wrong data self-heals after TTL
+   notices and manually deletes
+```
+
+**Strengths:**
+- **Self-healing**: Stale or orphaned data automatically expires -- no manual cleanup needed
+- **Simple to implement**: One parameter (`EX` or `setex`) added to every cache write
+- **Bounded staleness**: You can guarantee data is never staler than the TTL duration -- turns an unbounded consistency problem into a bounded one
+- **Memory management**: Expired keys are reclaimed by Redis, preventing unbounded memory growth
+
+**Weaknesses:**
+- **Staleness window**: Data can be stale for up to the TTL duration -- a 1-hour TTL means a price change takes up to 1 hour to appear
+- **TTL tuning is an art**: Too short = high miss rate and frequent DB hits; too long = stale data for longer
+- **Not sufficient alone for write-heavy data**: If the same key is updated 100 times between TTL expirations, only the first write after a miss gets cached -- combine with write-through for hot data
+
+**TTL is not a strategy you choose *instead of* lazy loading or write-through -- it is a strategy you layer *on top of* both.** Every `setex` call in the lazy loading and write-through examples above already includes a TTL. The key insight is recognizing TTL as a deliberate strategy (not just a parameter) with its own trade-offs around staleness tolerance vs. cache hit rate.
+
 ### The Recommended Combination
 
 In production, the strategies are **complementary, not competing**:
